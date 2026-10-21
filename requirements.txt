@@ -1,0 +1,2 @@
+aiohttp>=3.13.0,<4
+python-rtmidi>=1.5.8,<2

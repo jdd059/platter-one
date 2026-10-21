@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#191b1b">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <title>Platter One</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="/style.css">
+  <script type="module" src="/app.js"></script>
+</head>
+<body>
+  <main>
+    <header>
+      <div class="wordmark">platter<span>one</span><small>TOUCH SCRATCH CONTROLLER</small></div>
+      <div id="connection" role="status" aria-live="polite"><i></i><span id="status">Not paired</span></div>
+    </header>
+    <section class="toolbar" aria-label="Platter settings">
+      <div class="control"><label for="deck">DECK</label><select id="deck"><option value="1">01</option><option value="2">02</option></select></div>
+      <div class="layouts" aria-label="Layout"><button id="full" aria-pressed="true">Full platter</button><button id="half" aria-pressed="false">Half platter</button></div>
+      <div class="control sensitivity"><label for="sensitivity">SENSITIVITY</label><input id="sensitivity" type="range" min="0.5" max="2" value="1" step="0.05"><output id="gain">1.00×</output></div>
+    </section>
+    <section id="stage" aria-label="Virtual turntable">
+      <div class="stage-caption"><span>DIRECT TOUCH / 33⅓ RPM</span><span id="gesture">READY TO TOUCH</span></div>
+      <div id="record" role="application" aria-label="Scratch platter. Drag around the record to scratch the selected deck.">
+        <div id="vinyl" aria-hidden="true">
+          <div class="grooves"></div><div class="runout"></div>
+          <div class="label"><span class="label-top">PLATTER ONE</span><strong>01</strong><span class="label-bottom">SIDE A / TOUCH SERIES</span><div class="spindle"></div></div>
+          <div class="cue-mark"></div>
+        </div>
+      </div>
+      <div id="notice">Open the pairing URL printed by the Mac bridge</div>
+    </section>
+    <footer><span id="hint">Touch to hold. Rotate to scratch. Lift to release.</span><span id="latency">LOCAL INPUT ONLY</span></footer>
+    <details id="help"><summary>Connection &amp; setup</summary><p id="setup">Run the Mac bridge, then open its pairing URL on this device. Both devices must be on the same trusted network. Enable the Platter One mapping in Mixxx. A bridge connection does not confirm Mixxx is receiving MIDI.</p><p>Audio, playback, crossfader, cuts, cues, and samples stay in Mixxx and on your MIDI Fighter. This record moves only with your finger; it is not a playback display.</p><button id="reconnect">Reconnect</button></details>
+  </main>
+</body>
+</html>
