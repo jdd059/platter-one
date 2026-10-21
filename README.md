@@ -30,10 +30,11 @@ You can double-click **Start Platter One.command** after setup. Stop the bridge 
 
 - **Full platter**: the complete vinyl record fits the available touch area
 - **Half platter**: an oversized record extends below and beyond the screen, with its real center used for angle calculations
+- **Inertia**: enabled by default; flick and lift to coast in either direction, or touch again to catch the record. A stationary hold before lifting releases normally. Disable it for immediate release
 - **Sensitivity**: 1× maps one finger revolution to one record revolution at 33⅓ RPM; 0.5× to 2× adjusts movement gain
 - Layout, deck, sensitivity, and viewport changes release the platter before changing geometry or routing
 
-The label follows finger movement only. It is not synchronized to track playback. The displayed round-trip time measures the browser/bridge connection, not total audio latency. **Bridge online · Mixxx unverified** deliberately does not claim the Mixxx mapping is enabled or audio is audible.
+The record follows your finger and any simulated coast. It is not synchronized to track playback. Inertia models a freewheeling record slowing under friction; when the coast ends, Mixxx returns to its existing playback state. It does not simulate a continuously powered turntable motor. The displayed round-trip time measures the browser/bridge connection, not total audio latency. **Bridge online · Mixxx unverified** deliberately does not claim the Mixxx mapping is enabled or audio is audible.
 
 ## Architecture
 
@@ -52,6 +53,8 @@ Each launch prints a fresh random pairing token in the URL fragment. The page mo
 A held finger sends a heartbeat every 100 ms. Missing input releases the bridge after 500 ms, and the mapping has an independent 750 ms watchdog if the bridge dies. Graceful stop, disconnect, malformed input, pointer cancellation, focus loss, and page hiding also release. Browser congestion/stall detection closes the connection rather than intentionally replaying a backlog. These are best-effort guards, not a hard real-time guarantee.
 
 If a connection stalls, lift and touch again after it recovers. A second device is refused until the first disconnects. To transfer devices, close the first page. If Safari cannot connect, check the printed URL/token, same-LAN access, guest Wi-Fi client isolation, VPN, macOS firewall, and local network permissions. Reloading a pairing URL from an older bridge launch will not work.
+
+For wired options, see [USB-C and Ethernet setup](docs/wired-connection.md). A USB-C cable alone does not move Safari traffic off Wi-Fi.
 
 For rough scratching, try a better Wi-Fi connection and lower the Mixxx audio buffer while monitoring dropouts. Physical Safari touch behavior, network jitter, audible response, and your MIDI Fighter cuts must be judged on your devices. No latency or scratch-quality target is claimed from automated tests.
 

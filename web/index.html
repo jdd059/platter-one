@@ -19,6 +19,7 @@
     <section class="toolbar" aria-label="Platter settings">
       <div class="control"><label for="deck">DECK</label><select id="deck"><option value="1">01</option><option value="2">02</option></select></div>
       <div class="layouts" aria-label="Layout"><button id="full" aria-pressed="true">Full platter</button><button id="half" aria-pressed="false">Half platter</button></div>
+      <label class="inertia"><input id="inertia" type="checkbox" checked> Inertia</label>
       <div class="control sensitivity"><label for="sensitivity">SENSITIVITY</label><input id="sensitivity" type="range" min="0.5" max="2" value="1" step="0.05"><output id="gain">1.00×</output></div>
     </section>
     <section id="stage" aria-label="Virtual turntable">
@@ -32,8 +33,8 @@
       </div>
       <div id="notice">Open the pairing URL printed by the Mac bridge</div>
     </section>
-    <footer><span id="hint">Touch to hold. Rotate to scratch. Lift to release.</span><span id="latency">LOCAL INPUT ONLY</span></footer>
-    <details id="help"><summary>Connection &amp; setup</summary><p id="setup">Run the Mac bridge, then open its pairing URL on this device. Both devices must be on the same trusted network. Enable the Platter One mapping in Mixxx. A bridge connection does not confirm Mixxx is receiving MIDI.</p><p>Audio, playback, crossfader, cuts, cues, and samples stay in Mixxx and on your MIDI Fighter. This record moves only with your finger; it is not a playback display.</p><button id="reconnect">Reconnect</button></details>
+    <footer><span id="hint">Touch to hold. Rotate to scratch. Flick to coast.</span><span id="latency">LOCAL INPUT ONLY</span></footer>
+    <details id="help"><summary>Connection &amp; setup</summary><p id="setup">Run the Mac bridge, then open its pairing URL on this device. Both devices must be on the same trusted network. Enable the Platter One mapping in Mixxx. A bridge connection does not confirm Mixxx is receiving MIDI.</p><p>Audio, playback, crossfader, cuts, cues, and samples stay in Mixxx and on your MIDI Fighter. With Inertia enabled, flick and lift to coast, or touch again to catch the record. Hold still before lifting to release normally. This is a virtual record, not a track playback display.</p><button id="reconnect">Reconnect</button></details>
   </main>
 </body>
 </html>

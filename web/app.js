@@ -1,4 +1,4 @@
-import { angleAt, angularDelta } from './geometry.mjs';
+import { angleAt, angularDelta, MotionTracker, coastStep, STOP_SPEED, MAX_COAST_MS } from './geometry.mjs';
 
 const $ = id => document.getElementById(id);
 const record = $('record');
@@ -6,6 +6,8 @@ const stage = $('stage');
 let socket, connected = false, pointer = null, previous = null, rotation = 0;
 let deck = 1, layout = 'full', sensitivity = 1, touchedAt = 0;
 let reconnectTimer, lastReply = 0, stopped = false, preview = false;
+const motion = new MotionTracker();
+let inertia = true, coast = null, animation = null;
 const fragment = new URLSearchParams(location.hash.slice(1));
 let token = fragment.get('token') || sessionStorage.getItem('platter-token') || '';
 if (token) {
@@ -30,16 +32,60 @@ function send(message) {
   socket.send(JSON.stringify(message));
   return true;
 }
-function release(transmit = true) {
+function rotate(radians) {
+  rotation = (rotation + radians * 180 / Math.PI) % 360;
+  $('vinyl').style.transform = `rotate(${rotation}deg)`;
+}
+function move(radians) {
+  const scaled = radians * sensitivity;
+  const parts = Math.max(1, Math.ceil(Math.abs(scaled) / Math.PI));
+  for (let part = 0; part < parts; part++) {
+    if (!send({ type: 'move', deck, radians: scaled / parts })) return false;
+  }
+  rotate(radians);
+  return true;
+}
+function animateCoast(time) {
+  animation = null;
+  if (!coast) return;
+  const elapsed = (time - coast.time) / 1000;
+  // Stop after a suspended frame instead of sending a catch-up burst.
+  if (!connected || elapsed > 0.15 || time - coast.start > MAX_COAST_MS) {
+    release();
+    return;
+  }
+  if (elapsed > 0) {
+    const next = coastStep(coast.velocity, elapsed);
+    coast.velocity = next.velocity;
+    coast.time = time;
+    if (!move(next.radians)) return;
+    if (Math.abs(next.velocity) < STOP_SPEED) {
+      release();
+      return;
+    }
+  }
+  animation = requestAnimationFrame(animateCoast);
+}
+function release(transmit = true, allowCoast = false, time = performance.now()) {
   const id = pointer;
+  const wasActive = id !== null || coast !== null;
+  if (animation !== null) cancelAnimationFrame(animation);
+  animation = null;
+  coast = null;
+  const velocity = allowCoast && inertia && connected && id !== null ? motion.release(time) : 0;
   pointer = null;
   previous = null;
   record.classList.remove('held');
   $('gesture').textContent = 'READY TO TOUCH';
-  if (id !== null) {
-    if (transmit) send({ type: 'up', deck });
-    if (record.hasPointerCapture(id)) record.releasePointerCapture(id);
+  if (velocity) {
+    // Keep the bridge touch lease while synthetic movement drives the real mapping.
+    coast = {velocity, time: performance.now(), start: performance.now()};
+    $('gesture').textContent = preview ? 'PREVIEW / COASTING' : 'COASTING';
+    animation = requestAnimationFrame(animateCoast);
+  } else if (transmit && wasActive) {
+    send({ type: 'up', deck });
   }
+  if (id !== null && record.hasPointerCapture(id)) record.releasePointerCapture(id);
 }
 function disconnect(reason) {
   release(false);
@@ -106,10 +152,12 @@ record.addEventListener('pointerdown', event => {
   const angle = angleAt(event.clientX, event.clientY, record.getBoundingClientRect());
   if (angle === null) return;
   event.preventDefault();
+  if (coast !== null) release();
   if (!send({ type: 'down', deck })) return;
   pointer = event.pointerId;
   previous = angle;
   touchedAt = event.timeStamp;
+  motion.reset(event.timeStamp);
   record.setPointerCapture(pointer);
   record.classList.add('held');
   $('gesture').textContent = preview ? 'PREVIEW / HELD' : 'HELD / SCRATCH';
@@ -133,20 +181,18 @@ record.addEventListener('pointermove', event => {
     const angle = angleAt(sample.clientX, sample.clientY, rect);
     if (angle !== null && previous !== null) {
       const delta = angularDelta(previous, angle);
-      // Send physical angle; sensitivity is applied as bounded sub-deltas.
-      const scaled = delta * sensitivity;
-      const parts = Math.max(1, Math.ceil(Math.abs(scaled) / Math.PI));
-      for (let part = 0; part < parts; part++) {
-        if (!send({ type: 'move', deck, radians: scaled / parts })) break;
-      }
-      rotation += delta * 180 / Math.PI;
-      rotation %= 360;
-      $('vinyl').style.transform = `rotate(${rotation}deg)`;
+      motion.move(delta, sample.timeStamp);
+      if (!move(delta)) break;
+    } else {
+      motion.reset(sample.timeStamp);
     }
     previous = angle;
   }
 }, { passive: false });
-for (const name of ['pointerup', 'pointercancel', 'lostpointercapture']) {
+record.addEventListener('pointerup', event => {
+  if (pointer === event.pointerId) release(true, true, event.timeStamp);
+});
+for (const name of ['pointercancel', 'lostpointercapture']) {
   record.addEventListener(name, event => {
     if (pointer === event.pointerId) release();
   });
@@ -162,7 +208,7 @@ setInterval(() => {
     disconnect('Connection stalled');
     return;
   }
-  if (pointer !== null) {
+  if (pointer !== null || coast !== null) {
     // A stationary touch is valid; only movement sample gaps need re-anchoring.
     touchedAt = performance.now();
     send({ type: 'hold', deck });
@@ -195,6 +241,11 @@ $('sensitivity').addEventListener('input', event => {
   release();
   sensitivity = Number(event.target.value);
   $('gain').textContent = `${sensitivity.toFixed(2)}×`;
+});
+$('inertia').addEventListener('change', event => {
+  release();
+  inertia = event.target.checked;
+  $('hint').textContent = inertia ? 'Touch to hold. Rotate to scratch. Flick to coast.' : 'Touch to hold. Rotate to scratch. Lift to release.';
 });
 $('reconnect').addEventListener('click', () => {
   if (socket && socket.readyState < WebSocket.CLOSING) {

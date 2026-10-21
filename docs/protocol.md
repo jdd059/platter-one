@@ -26,3 +26,9 @@ MIDI channel 1 is deck 1; channel 2 is deck 2. Only the dedicated virtual source
 Movement resolution is 2048 ticks per revolution. Quantization retains the fractional remainder for the next sample; direction changes preserve net displacement. Each CC chunk is at most 63 ticks in either direction. Both bridge and Mixxx script must agree on resolution.
 
 The bridge releases at 500 ms without move/hold input. The mapping checks every 100 ms and releases after 750 ms without received MIDI movement/hold. Browser heartbeats are sent every 100 ms; the UI closes the connection after 700 ms without a bridge response or if outgoing buffering exceeds 1024 bytes. These thresholds favor releasing a stuck touch; they do not guarantee a maximum end-to-end delay.
+
+## Inertia
+
+Inertia reuses the existing down/move/hold/up lifecycle. On a fresh flick release, the page retains the logical touch, sends simulated signed movement and heartbeats, and animates the record from the same angular displacement. It estimates speed from recent pointer samples, limits the release speed, and applies exponential friction independent of animation frame rate. A stationary release sends up immediately.
+
+Coasting stops below the speed threshold or at a 3.5-second cap. A frame gap over 150 ms releases instead of sending accumulated catch-up movement. Retouch, cancellation, focus loss, disconnect, settings changes, and a bridge timeout cancel coasting. The existing bridge and Mixxx watchdogs remain in force. No new MIDI mapping or protocol message is required.

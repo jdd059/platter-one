@@ -38,4 +38,6 @@ The network, browser event loop, MIDI scheduler, script thread, Mixxx filter, an
 
 ## Scope
 
-Two selectable decks share one platter. There is no browser playback, audio processing, mixer, cue, cut, sampler, library, track telemetry, or Ableton control implementation. The geometry/protocol layer can inform a later controller experiment without introducing that work now.
+Two selectable decks share one platter. The optional freewheel simulation estimates release velocity from recent touch samples, integrates exponential friction locally, and sends the resulting movement through the same scratch path. It drives audio input and record animation together; it is not a cosmetic-only spin. It does not infer Mixxx play state or simulate a powered turntable motor.
+
+There is no browser playback, audio processing, mixer, cue, cut, sampler, library, track telemetry, or Ableton control implementation. The geometry/protocol layer can inform a later controller experiment without introducing that work now.
