@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<MixxxControllerPreset schemaVersion="1" mixxxVersion="2.5.0+">
+  <info>
+    <name>Platter One</name>
+    <author>Platter One contributors</author>
+    <description>Touch platter only, decks 1 and 2. Requires the Platter One bridge.</description>
+  </info>
+  <controller id="Platter One">
+    <scriptfiles><file filename="Platter-One-scripts.js" functionprefix="PlatterOne"/></scriptfiles>
+    <controls>
+      <control>
+        <group>[Channel1]</group>
+        <key>PlatterOne.touch</key>
+        <status>0x90</status>
+        <midino>0x00</midino>
+        <options><Script-Binding/></options>
+      </control>
+      <control>
+        <group>[Channel1]</group>
+        <key>PlatterOne.touch</key>
+        <status>0x80</status>
+        <midino>0x00</midino>
+        <options><Script-Binding/></options>
+      </control>
+      <control>
+        <group>[Channel1]</group>
+        <key>PlatterOne.move</key>
+        <status>0xB0</status>
+        <midino>0x10</midino>
+        <options><Script-Binding/></options>
+      </control>
+      <control>
+        <group>[Channel1]</group>
+        <key>PlatterOne.hold</key>
+        <status>0xB0</status>
+        <midino>0x11</midino>
+        <options><Script-Binding/></options>
+      </control>
+      <control>
+        <group>[Channel2]</group>
+        <key>PlatterOne.touch</key>
+        <status>0x91</status>
+        <midino>0x00</midino>
+        <options><Script-Binding/></options>
+      </control>
+      <control>
+        <group>[Channel2]</group>
+        <key>PlatterOne.touch</key>
+        <status>0x81</status>
+        <midino>0x00</midino>
+        <options><Script-Binding/></options>
+      </control>
+      <control>
+        <group>[Channel2]</group>
+        <key>PlatterOne.move</key>
+        <status>0xB1</status>
+        <midino>0x10</midino>
+        <options><Script-Binding/></options>
+      </control>
+      <control>
+        <group>[Channel2]</group>
+        <key>PlatterOne.hold</key>
+        <status>0xB1</status>
+        <midino>0x11</midino>
+        <options><Script-Binding/></options>
+      </control>
+    </controls>
+    <outputs/>
+  </controller>
+</MixxxControllerPreset>
